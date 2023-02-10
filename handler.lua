@@ -5,7 +5,6 @@
 
 --Commented out
 --local BasePlugin = require "kong.plugins.base_plugin"
-
 --local responses = require "kong.tools.responses"
 local constants = require "kong.constants"
 local jwt_decoder = require "kong.plugins.jwt.jwt_parser"
@@ -14,7 +13,6 @@ local responses = kong.response
 local ngx_error = ngx.ERR
 local ngx_debug = ngx.DEBUG
 local ngx_log = ngx.log
-vdebug = false
 
 --variables to determine which policy to apply
 local policy_ALL = 'all'
@@ -127,9 +125,12 @@ end
 
 
 function JWTAuthHandler:access(conf)
-    if debug then
-        kong.log.notice("Now processing the access hander")
-    end
+
+  local myvdebug = conf.vdebug
+
+  if myvdebug then
+      kong.log.notice("Now processing the access hander")
+  end
   --Commented out
 --JWTAuthHandler.super.access(self)
 
@@ -163,7 +164,7 @@ function JWTAuthHandler:access(conf)
   local myco_id = conf.co_id
   local myrootgroupid = conf.rootgroupid
 
-  if vdebug then
+  if myvdebug then
     kong.log.notice("Config error message ALL: ", conf.msg_error_all)
     kong.log.notice("Config error message ANY: ", conf.msg_error_any)
     kong.log.notice("Config error message RNC: ", conf.msg_error_not_roles_claimed)
@@ -177,27 +178,27 @@ function JWTAuthHandler:access(conf)
   --empty table variable
   local roles_table = {}
 
-kong.log.notice("co_id: ", myco_id)    
-kong.log.notice("rootgroupid: ", myrootgroupid)
-
-kong.log.notice("thisco_id: ", thisco_id)
-kong.log.notice("thisrootgroupud: ", thisrootgroupud)
-
+if myvdebug then
+  kong.log.notice("co_id: ", myco_id)    
+  kong.log.notice("rootgroupid: ", myrootgroupid)
+  kong.log.notice("thisco_id: ", thisco_id)
+  kong.log.notice("thisrootgroupud: ", thisrootgroupud)
+end
 
 if myco_id ~= thisco_id then
-  return kong.response.exit(401, { message = "Invalid Company ID"})
+  return kong.response.exit(403, { message = "Invalid Company ID"})
 end
 
 if myrootgroupid ~= thisrootgroupud then
-  return kong.response.exit(401, { message = "Invalid Root Group ID"})
+  return kong.response.exit(403, { message = "Invalid Root Group ID"})
 end
 
 
-  if vdebug then
-    kong.log.notice("JWT Claims: ", claims)
-    kong.log.notice("roles: ", roles)
-    kong.log.notice("roles claim name: ", conf.roles_claim_name)
-  end
+if myvdebug then
+  kong.log.notice("JWT Claims: ", claims)
+  kong.log.notice("roles: ", roles)
+  kong.log.notice("roles claim name: ", conf.roles_claim_name)
+end
 
   --check if no roles claimed..
   if not roles then
@@ -248,8 +249,7 @@ end
 
   -- roles_cfg = "read", "write", "full", "update" --  from the Plugin definition
   -- roles = "read" -- from the Claims of the Token
-
-if debug then
+if myvdebug then
     -- log the roles_cfg table from the plugin
     for k,v in pairs(roles_cfg) do
         kong.log.notice(k,v)

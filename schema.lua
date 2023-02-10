@@ -10,6 +10,7 @@ return {
         fields = {
     {roles = { type = "array", elements = { type = "string" }, }, },
     {roles_claim_name = {type = "string", default = "roles"}},
+    {vdebug = {type = "boolean", default = false}},
     {co_id = {type = "string", default = "00000"}},
     {rootgroupid = {type = "string", default = "00000000-0000-0000-0000-000000000000"}},
     {msg_error_any = {type = "string", default = "To be able to use this service you must have at least one of the roles configured"}},
