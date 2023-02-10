@@ -160,6 +160,8 @@ function JWTAuthHandler:access(conf)
   local msg_error_any = conf.msg_error_any
   local msg_error_not_roles_claimed = conf.msg_error_not_roles_claimed
   local roles_cfg = conf.roles
+  local myco_id = conf.co_id
+  local myrootgroupid = conf.rootgroupid
 
   if vdebug then
     kong.log.notice("Config error message ALL: ", conf.msg_error_all)
@@ -170,8 +172,26 @@ function JWTAuthHandler:access(conf)
   --variables from the decoded JWT
   local claims = jwt.claims
   local roles = claims[conf.roles_claim_name]
+  local thisrootgroupud = claims['rootgroupid']
+  local thisco_id = claims['co_id']
   --empty table variable
   local roles_table = {}
+
+kong.log.notice("co_id: ", myco_id)    
+kong.log.notice("rootgroupid: ", myrootgroupid)
+
+kong.log.notice("thisco_id: ", thisco_id)
+kong.log.notice("thisrootgroupud: ", thisrootgroupud)
+
+
+if myco_id ~= thisco_id then
+  return kong.response.exit(401, { message = "Invalid Company ID"})
+end
+
+if myrootgroupid ~= thisrootgroupud then
+  return kong.response.exit(401, { message = "Invalid Root Group ID"})
+end
+
 
   if vdebug then
     kong.log.notice("JWT Claims: ", claims)
