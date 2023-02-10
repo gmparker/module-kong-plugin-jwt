@@ -1,3 +1,5 @@
+-- Updated for Kong 3.0.x
+
 local typedefs = require "kong.db.schema.typedefs"
 
 return {

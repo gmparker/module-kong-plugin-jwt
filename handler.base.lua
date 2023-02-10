@@ -1,5 +1,5 @@
 -- Updated handler.lua file for Kong 3.x.x
-
+--
 --Commented out
 --local BasePlugin = require "kong.plugins.base_plugin"
 

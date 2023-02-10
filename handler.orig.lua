@@ -1,3 +1,4 @@
+--
 -- Original handler.lua file from: https://github.com/prabago/kong-plugin-jwt-auth-rbac/blob/master/handler.lua
 
 local BasePlugin = require "kong.plugins.base_plugin"

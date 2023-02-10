@@ -1,6 +1,3 @@
---/home/ec2-user/.luarocks/share/lua/5.1/kong/plugins/jwt-auth-rbac
---sudo /usr/local/bin/kong restart
-
 -- Updated handler.lua file for Kong 3.x.x
 
 --Commented out
