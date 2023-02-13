@@ -1,0 +1,1 @@
+insert into lytx_customers2 (co_id, rootgroupid, iss) values ('00001', '0000000001', '1111111111');
