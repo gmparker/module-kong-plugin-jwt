@@ -36,6 +36,8 @@ function table:filter(filterFnc)
   return result
 end
 
+
+
 -- Function to get index of a value at a table.
 -- @param any value
 -- @return any
@@ -46,6 +48,8 @@ function table:find(value)
       end
   end
 end
+
+
 
 
 -- Function that checks wheter all given roles are also present in the claimed roles
@@ -66,6 +70,8 @@ local function all_roles_in_roles_claim(roles_to_check, claimed_roles)
 
   return result
 end
+
+
 
 
 -- Function that checks whether a claimed role is part of a given list of roles.
@@ -90,6 +96,8 @@ local function role_in_roles_claim(roles_to_check, claimed_roles)
   return result
 end
 
+
+
 -- Function that splits a string into substrings by reparator
 -- @param str (string) the string to be splitted
 -- @param sep (string) single character string (!) to separate on
@@ -109,6 +117,7 @@ end
 
 
 
+
 -- Function to query database for customer id if not found in cache
 local function load_customer(inco_id)
   kong.log.notice("Executing database function: " .. tostring(inco_id))
@@ -117,17 +126,22 @@ local function load_customer(inco_id)
 
   if err then
     kong.log.err("Error when selecting co_id from the database: " .. err)
-    return kong.response.exit(401, { message = "Error when selecting co_id from the database: " .. tostring(thisco_id)})
+    return kong.response.exit(401, { message = "Error when selecting co_id from the database: " .. err})
   end
   
   if not customer then
-    kong.log.err("Could not find customer ID.")
+    kong.log.err("Could not find customer ID: " .. tostring(inco_id))
     return kong.response.exit(401, { message = "Could not find customer ID: " .. tostring(inco_id)})
   end
 
   return customer
 end
 -- End function to query database for customer id if not found in cache
+
+
+
+
+
 
 -- Main function to execute
 function JWTAuthHandler:access(conf)
@@ -142,16 +156,16 @@ function JWTAuthHandler:access(conf)
   -- get the JWT from the Nginx context
   -- Commented out and replaced with updated version
   -- local token = ngx.ctx.authenticated_jwt_token
-  
   local token = kong.ctx.shared.authenticated_jwt_token
 
   if not token then
-    ngx_log(ngx_error, "[jwt-auth plugin] Cannot get JWT token, add the ",
-                       "JWT plugin to be able to use the JWT-Auth plugin")
+    ngx_log(ngx_error, "[jwt-auth-rbac plugin] Cannot get JWT token, add the ",
+                       "JWT plugin to be able to use the JWT-Auth-RBAC plugin")
                        return kong.response.exit(403, {
                         message = "You cannot consume this service"
                       })
   end
+
 
   -- Decode JWT to get claims values from token
   local jwt, err = jwt_decoder:new(token)
@@ -192,10 +206,10 @@ end
 
 
 -- implement caching
---hit_level 1 = hit, 2 = , 3 = miss
---local customer_cache_key = '02595'--kong.db.lytx_customers:cache_key(thisco_id)
-local customer_cache_key = thisco_id --kong.db.lytx_customers:cache_key('02595')
-local customer, err, hit_level = kong.cache:get(customer_cache_key, nil, load_customer, customer_cache_key)
+--hit_level 1 = hit, 2 = , 3 = miss, 4 = not in DB
+--local cache_key = kong.db.lytx_customers:cache_key(thisco_id)
+local cache_key = thisco_id --kong.db.lytx_customers:cache_key('02595')
+local customer, err, hit_level = kong.cache:get(cache_key, nil, load_customer, cache_key)
   kong.log.notice("Cache Hit Level: ", hit_level)
 local myco_id = customer.co_id
 local myrootgroupid = customer.rootgroupid
