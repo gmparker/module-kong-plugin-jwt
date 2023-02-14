@@ -165,8 +165,8 @@ function JWTAuthHandler:access(conf)
   local msg_error_not_roles_claimed = conf.msg_error_not_roles_claimed
   local roles_cfg = conf.roles
 --Commented out to replace with database call
---local myco_id = conf.co_id
---local myrootgroupid = conf.rootgroupid
+  --local myco_id = conf.co_id
+  --local myrootgroupid = conf.rootgroupid
 
   if myvdebug then
     kong.log.notice("Config error message ALL: ", conf.msg_error_all)
