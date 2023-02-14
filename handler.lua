@@ -133,7 +133,8 @@ function JWTAuthHandler:access(conf)
 
   -- get the JWT from the Nginx context
   -- Commented out and replaced with updated version
-  --local token = ngx.ctx.authenticated_jwt_token
+  -- local token = ngx.ctx.authenticated_jwt_token
+  
   local token = kong.ctx.shared.authenticated_jwt_token
 
   if not token then
@@ -160,6 +161,8 @@ function JWTAuthHandler:access(conf)
   local roles_cfg = conf.roles
   local myco_id = conf.co_id
   local myrootgroupid = conf.rootgroupid
+
+
 
   if myvdebug then
     kong.log.notice("Config error message ALL: ", conf.msg_error_all)
