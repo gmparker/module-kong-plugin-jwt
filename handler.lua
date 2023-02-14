@@ -121,7 +121,7 @@ local function load_customer(inco_id)
   
   if not customer then
     kong.log.err("Could not find customer ID.")
-    return kong.response.exit(401, { message = "Could not find customer ID: " .. tostring(thisco_id)})
+    return kong.response.exit(401, { message = "Could not find customer ID: " .. tostring(inco_id)})
   end
 
   return customer
