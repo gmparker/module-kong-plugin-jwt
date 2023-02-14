@@ -19,8 +19,6 @@ local JWTAuthHandler = {
   PRIORITY = 950,
 }
 
-
-
 -- Function to filter a table
 -- @param filterFnc (function) filter function
 -- @return (table) the filtered table 
@@ -120,8 +118,9 @@ end
 
 -- Function to query database for customer id if not found in cache
 local function load_customer(inco_id)
+
   kong.log.notice("Executing database function: " .. tostring(inco_id))
- 
+
   local customer, err = kong.db.lytx_customers:select({co_id = inco_id})
 
   if err then
@@ -147,6 +146,8 @@ end
 function JWTAuthHandler:access(conf)
 
   local myvdebug = conf.vdebug
+  --kong.log.notice(tostring(myvdebug))
+  --kong.log.notice(tostring(conf.vdebug))
 
   if myvdebug then
       kong.log.notice("Now processing the access hander")
@@ -210,7 +211,11 @@ end
 --local cache_key = kong.db.lytx_customers:cache_key(thisco_id)
 local cache_key = thisco_id --kong.db.lytx_customers:cache_key('02595')
 local customer, err, hit_level = kong.cache:get(cache_key, nil, load_customer, cache_key)
+
+if myvdebug then
   kong.log.notice("Cache Hit Level: ", hit_level)
+end
+
 local myco_id = customer.co_id
 local myrootgroupid = customer.rootgroupid
 -- implement caching
