@@ -1,8 +1,5 @@
 -- Updated handler.lua file for Kong 3.x.x
 
---Commented out
---local BasePlugin = require "kong.plugins.base_plugin"
---local responses = require "kong.tools.responses"
 local constants = require "kong.constants"
 local jwt_decoder = require "kong.plugins.jwt.jwt_parser"
 local responses = kong.response
@@ -11,30 +8,19 @@ local ngx_error = ngx.ERR
 local ngx_debug = ngx.DEBUG
 local ngx_log = ngx.log
 
---variables to determine which policy to apply
+--Declare variables to determine which policy to apply
 local policy_ALL = 'all'
 local policy_ANY = 'any'
 
--- New code added
+-- Set plugin version and priority
 local JWTAuthHandler = {
   VERSION  = "0.1.0",
   PRIORITY = 950,
 }
 
 
---Commented out
---local JWTAuthHandler = BasePlugin:extend()
 
---Commented out
---JWTAuthHandler.PRIORITY = 950
---JWTAuthHandler.VERSION = "0.1.0"
-
---Commented out
---function JWTAuthHandler:new()
-  --JWTAuthHandler.super.new(self, "jwt-auth")
---end
-
---- Filter a table
+-- Function to filter a table
 -- @param filterFnc (function) filter function
 -- @return (table) the filtered table 
 function table:filter(filterFnc)
@@ -49,7 +35,7 @@ function table:filter(filterFnc)
   return result
 end
 
---- Get index of a value at a table.
+-- Function to get index of a value at a table.
 -- @param any value
 -- @return any
 function table:find(value)
@@ -61,7 +47,7 @@ function table:find(value)
 end
 
 
---- checks wheter all given roles are also present in the claimed roles
+-- Function that checks wheter all given roles are also present in the claimed roles
 -- @param roles_to_check (array) an array of role names
 -- @param claimed_roles (table) list of roles claimed in JWT
 -- @return (boolean) true if all given roles are also in the claimed roles
@@ -81,7 +67,7 @@ local function all_roles_in_roles_claim(roles_to_check, claimed_roles)
 end
 
 
---- checks whether a claimed role is part of a given list of roles.
+-- Function that checks whether a claimed role is part of a given list of roles.
 -- @param roles_to_check (array) an array of role names.
 -- @param claimed_roles (table) list of roles claimed in JWT
 -- @return (boolean) whether a claimed role is part of any of the given roles.
@@ -103,7 +89,7 @@ local function role_in_roles_claim(roles_to_check, claimed_roles)
   return result
 end
 
---- split a string into substrings by reparator
+-- Function that splits a string into substrings by reparator
 -- @param str (string) the string to be splitted
 -- @param sep (string) single character string (!) to separate on
 -- @return (table) list of separated parts
@@ -121,6 +107,28 @@ local function split(str, sep)
 end
 
 
+
+-- Function to query database for customer id if not found in cache
+local function load_customer(inco_id)
+  kong.log.notice("Executing database function")
+ 
+  local customer, err = kong.db.lytx_customers:select({co_id = inco_id})
+
+  if err then
+    kong.log.err("Error when selecting co_id from the database: " .. err)
+    return kong.response.exit(401, { message = "Error when selecting co_id from the database: " .. tostring(thisco_id)})
+  end
+  
+  if not customer then
+    kong.log.err("Could not find customer ID.")
+    return kong.response.exit(401, { message = "Could not find customer ID: " .. tostring(thisco_id)})
+  end
+
+  return customer
+end
+-- End function to query database for customer id if not found in cache
+
+-- Main function to execute
 function JWTAuthHandler:access(conf)
 
   local myvdebug = conf.vdebug
@@ -128,8 +136,7 @@ function JWTAuthHandler:access(conf)
   if myvdebug then
       kong.log.notice("Now processing the access hander")
   end
-  --Commented out
---JWTAuthHandler.super.access(self)
+
 
   -- get the JWT from the Nginx context
   -- Commented out and replaced with updated version
@@ -143,13 +150,11 @@ function JWTAuthHandler:access(conf)
                        return kong.response.exit(403, {
                         message = "You cannot consume this service"
                       })
-    --return responses.send_HTTP_FORBIDDEN("You cannot consume this service")
   end
 
-  -- decode token to get roles claim
+  -- Decode JWT to get claims values from token
   local jwt, err = jwt_decoder:new(token)
   if err then
-    -- return false, {status = 401, message = "Bad token; " .. tostring(err)}
     return kong.response.exit(401, { message = "Bad token; " .. tostring(err)})
   end
   
@@ -159,10 +164,9 @@ function JWTAuthHandler:access(conf)
   local msg_error_any = conf.msg_error_any
   local msg_error_not_roles_claimed = conf.msg_error_not_roles_claimed
   local roles_cfg = conf.roles
-  local myco_id = conf.co_id
-  local myrootgroupid = conf.rootgroupid
-
-
+--Commented out to replace with database call
+--local myco_id = conf.co_id
+--local myrootgroupid = conf.rootgroupid
 
   if myvdebug then
     kong.log.notice("Config error message ALL: ", conf.msg_error_all)
@@ -185,10 +189,18 @@ if myvdebug then
   kong.log.notice("thisrootgroupud: ", thisrootgroupud)
 end
 
+  -- Call function to connect to database and query for co_id passed in claims payload
+  local entity = load_customer(thisco_id)
+  local myco_id = entity.co_id
+  local myrootgroupid = entity.rootgroupid
+  -- End call database query function
+
+-- Validate company ID  
 if myco_id ~= thisco_id then
   return kong.response.exit(403, { message = "Invalid Company ID"})
 end
 
+-- Validate rootgroupID
 if myrootgroupid ~= thisrootgroupud then
   return kong.response.exit(403, { message = "Invalid Root Group ID"})
 end
@@ -202,11 +214,7 @@ end
 
   --check if no roles claimed..
   if not roles then
-    --return responses.send_HTTP_FORBIDDEN("You cannot consume this service")
-    return kong.response.exit(403, {
-      -- message = "You cannot consume this service"
-      message = msg_error_not_roles_claimed
-    })
+    return kong.response.exit(403, {message = msg_error_not_roles_claimed})
   end
 
 
@@ -264,9 +272,7 @@ end
 
   --validate roles against claims for policy type = ANY
   if conf.policy == policy_ANY and not role_in_roles_claim(roles_cfg, roles) then
-    --return responses.send_HTTP_FORBIDDEN("You cannot consume this service")
     return kong.response.exit(403, {
-      -- message = "You can't use these service"
       detail = "The required roles for this invocation are [" .. table.concat(roles_cfg,", ") .. "] and your roles are [" .. table.concat(roles,", ").."]",
       message = msg_error_any
 
@@ -276,9 +282,7 @@ end
   
   --validate roles against claims for policy type = ALL
   if conf.policy == policy_ALL and not all_roles_in_roles_claim(roles_cfg, roles) then
-    --return responses.send_HTTP_FORBIDDEN("You cannot consume this service")
     return kong.response.exit(403, {
-      -- message = "You can't use these service"
       detail = "The required roles for this invocation are [" .. table.concat(roles_cfg,", ") .. "] and your roles are [" .. table.concat(roles,", ").."]",
       message = msg_error_all
     })

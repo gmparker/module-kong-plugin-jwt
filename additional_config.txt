@@ -1,0 +1,34 @@
+-- create migrations subdirectory
+
+mkdir migrations
+cd migrations
+
+-- create init.lua file
+sudo nano init.lua
+
+
+-- create sudo nano 000_jwt_auth_rbac.lua file
+sudo nano 000_jwt_auth_rbac.lua
+
+
+-- change back to main directory
+cd ..
+
+-- create daos.lua file
+sudo nano daos.lua
+
+-- run migrations update
+sudo /usr/local/bin/kong migrations up
+
+-- restart kong
+sudo /usr/local/bin/kong restart
+
+-- update handler.lua file
+
+
+
+
+
+
+
+
