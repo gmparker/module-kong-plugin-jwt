@@ -1,5 +1,6 @@
 -- Updated handler.lua file for Kong 3.x.x
-
+local cache = kong.cache
+local kong = kong
 local constants = require "kong.constants"
 local jwt_decoder = require "kong.plugins.jwt.jwt_parser"
 local responses = kong.response
@@ -110,7 +111,7 @@ end
 
 -- Function to query database for customer id if not found in cache
 local function load_customer(inco_id)
-  kong.log.notice("Executing database function")
+  kong.log.notice("Executing database function: " .. tostring(inco_id))
  
   local customer, err = kong.db.lytx_customers:select({co_id = inco_id})
 
@@ -189,10 +190,22 @@ if myvdebug then
   kong.log.notice("thisrootgroupud: ", thisrootgroupud)
 end
 
+
+-- implement caching
+--hit_level 1 = hit, 2 = , 3 = miss
+--local customer_cache_key = '02595'--kong.db.lytx_customers:cache_key(thisco_id)
+local customer_cache_key = thisco_id --kong.db.lytx_customers:cache_key('02595')
+local customer, err, hit_level = kong.cache:get(customer_cache_key, nil, load_customer, customer_cache_key)
+  kong.log.notice("Cache Hit Level: ", hit_level)
+local myco_id = customer.co_id
+local myrootgroupid = customer.rootgroupid
+-- implement caching
+
+
   -- Call function to connect to database and query for co_id passed in claims payload
-  local entity = load_customer(thisco_id)
-  local myco_id = entity.co_id
-  local myrootgroupid = entity.rootgroupid
+  --local entity = load_customer(thisco_id)
+  --local myco_id = entity.co_id
+  --local myrootgroupid = entity.rootgroupid
   -- End call database query function
 
 -- Validate company ID  
