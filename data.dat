@@ -12,3 +12,13 @@ insert into lytx_customers (co_id, rootgroupid, iss) values ('02605',	'3EE79114-
 insert into lytx_customers (co_id, rootgroupid, iss) values ('02607',	'7DABEDE7-C9C1-E411-9970-02215E5E82A7', 'G0Yl92ix7l0sFn0taLkEo1Z4BVhiaiIy');
 insert into lytx_customers (co_id, rootgroupid, iss) values ('00061', 	'06AA2AF2-CCC1-E411-9970-02215E5E82A7', 'G0Yl92ix7l0sFn0taLkEo1Z4BVhiaiIy');
 
+curl -X POST http://localhost:8001/jwt-auth-rbac  --data "co_id=02594"  --data "rootgroupid=D3C633BE-7EBB-E411-9970-02215E5E82A7" --data "iss=G0Yl92ix7l0sFn0taLkEo1Z4BVhiaiIy"
+curl -X POST http://localhost:8001/jwt-auth-rbac  --data "co_id=02595"  --data "rootgroupid=FB524A2B-5ABC-E411-9970-02215E5E82A7" --data "iss=G0Yl92ix7l0sFn0taLkEo1Z4BVhiaiIy"
+curl -X POST http://localhost:8001/jwt-auth-rbac  --data "co_id=02597"  --data "rootgroupid=1898BBA0-66BC-E411-9970-02215E5E82A7" --data "iss=G0Yl92ix7l0sFn0taLkEo1Z4BVhiaiIy"
+curl -X POST http://localhost:8001/jwt-auth-rbac  --data "co_id=02598"  --data "rootgroupid=01C3693F-2CBD-E411-9970-02215E5E82A7" --data "iss=G0Yl92ix7l0sFn0taLkEo1Z4BVhiaiIy"
+curl -X POST http://localhost:8001/jwt-auth-rbac  --data "co_id=02599"  --data "rootgroupid=ACAFC0FF-2CBD-E411-9970-02215E5E82A7" --data "iss=G0Yl92ix7l0sFn0taLkEo1Z4BVhiaiIy"
+curl -X POST http://localhost:8001/jwt-auth-rbac  --data "co_id=02601"  --data "rootgroupid=22B94C4C-9ABE-E411-9970-02215E5E82A7" --data "iss=G0Yl92ix7l0sFn0taLkEo1Z4BVhiaiIy"
+curl -X POST http://localhost:8001/jwt-auth-rbac  --data "co_id=02602"  --data "rootgroupid=204C6C1D-9BBE-E411-9970-02215E5E82A7" --data "iss=G0Yl92ix7l0sFn0taLkEo1Z4BVhiaiIy"
+curl -X POST http://localhost:8001/jwt-auth-rbac  --data "co_id=02605"  --data "rootgroupid=3EE79114-C7C1-E411-9970-02215E5E82A7" --data "iss=G0Yl92ix7l0sFn0taLkEo1Z4BVhiaiIy"
+curl -X POST http://localhost:8001/jwt-auth-rbac  --data "co_id=02607"  --data "rootgroupid=7DABEDE7-C9C1-E411-9970-02215E5E82A7" --data "iss=G0Yl92ix7l0sFn0taLkEo1Z4BVhiaiIy"
+curl -X POST http://localhost:8001/jwt-auth-rbac  --data "co_id=00061"  --data "rootgroupid=06AA2AF2-CCC1-E411-9970-02215E5E82A7" --data "iss=G0Yl92ix7l0sFn0taLkEo1Z4BVhiaiIy"
