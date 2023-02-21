@@ -210,10 +210,10 @@ end
 
 -- implement caching
 --hit_level 1 = hit, 2 = , 3 = miss, 4 = not in DB
---local cache_key = kong.db.lytx_customers:cache_key(thisco_id)
---local cache_key = "29e4352d-345f-43bd-9e3a-a69d1376e629" --kong.db.lytx_customers:cache_key(thisco_id)
-local cache_key = thisco_id --kong.db.lytx_customers:cache_key('02595')
-local customer, err, hit_level = kong.cache:get(cache_key, nil, load_customer, thisco_id)
+--local customer_cache_key = kong.db.lytx_customers:cache_key(thisco_id)
+--local customer_cache_key = "29e4352d-345f-43bd-9e3a-a69d1376e629" --kong.db.lytx_customers:cache_key(thisco_id)
+local customer_cache_key = thisco_id --kong.db.lytx_customers:cache_key('02595')
+local customer, err, hit_level = kong.cache:get(customer_cache_key, nil, load_customer, thisco_id)
 
 if myvdebug then
   kong.log.notice("Cache Hit Level: ", hit_level)
