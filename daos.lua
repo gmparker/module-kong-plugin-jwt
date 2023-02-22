@@ -2,7 +2,7 @@ local typedefs = require "kong.db.schema.typedefs"
 
 return {
   {
-    primary_key = { "co_id" },
+    primary_key = { "id" },
     name = "lytx_customers",
     endpoint_key = "co_id",
     cache_key = { "co_id" },
@@ -14,6 +14,7 @@ return {
       { created_at = typedefs.auto_timestamp_s },
       { rootgroupid = { type = "string", required = true, unique = false, auto = false }, },
       { iss = { type = "string", required = true, unique = false, auto = false }, },
+      { roles = { type = "array", elements = {type = "string"}, required = false, auto = false }, },
     },
   },
 }

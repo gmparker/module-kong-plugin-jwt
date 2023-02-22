@@ -24,7 +24,4 @@ curl -X POST http://localhost:8001/jwt-auth-rbac  --data "co_id=02607"  --data "
 curl -X POST http://localhost:8001/jwt-auth-rbac  --data "co_id=00061"  --data "rootgroupid=06AA2AF2-CCC1-E411-9970-02215E5E82A7" --data "iss=G0Yl92ix7l0sFn0taLkEo1Z4BVhiaiIy"
 
 
-
-
-
-curl -X POST http://localhost:8001/jwt-auth-rbac  --data "co_id=00091"  --data "rootgroupid=06BA2AF2-CCC1-E411-9970-02215E5E82A7" --data "iss=G0Yl92ix7l0sFn0taLkEo1Z4BVhiaiIy"
+curl -X POST http://localhost:8001/jwt-auth-rbac  --data "co_id=00099"  --data "rootgroupid=06AA2AF2-CCC1-E411-9970-02215E5E82A7" --data "iss=G0Yl92ix7l0sFn0taLkEo1Z4BVhiaiIy" --data "roles={read, write"}

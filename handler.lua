@@ -121,9 +121,9 @@ local function load_customer(thisco_id)
 
   kong.log.notice("Executing database function: " .. tostring(thisco_id))
 
-  --local customer, err = kong.db.lytx_customers:select({co_id = inco_id})
-  local customer, err = kong.db.lytx_customers:select_by_cache_key(thisco_id)
   --local customer, err = kong.db.lytx_customers:select({co_id = thisco_id})
+  local customer, err = kong.db.lytx_customers:select_by_cache_key(thisco_id)
+  
 
   if err then
     kong.log.err("Error when selecting co_id from the database: " .. err)
@@ -131,8 +131,8 @@ local function load_customer(thisco_id)
   end
   
   if not customer then
-    kong.log.err("Could not find customer ID: " .. tostring(inco_id))
-    return kong.response.exit(401, { message = "Could not find customer ID: " .. tostring(inco_id)})
+    kong.log.err("Could not find customer ID: " .. tostring(thisco_id))
+    return kong.response.exit(401, { message = "Could not find customer ID: " .. tostring(thisco_id)})
   end
 
   return customer
@@ -148,9 +148,7 @@ end
 function JWTAuthHandler:access(conf)
 
   local myvdebug = conf.vdebug
-  --kong.log.notice(tostring(myvdebug))
-  --kong.log.notice(tostring(conf.vdebug))
-
+  
   if myvdebug then
       kong.log.notice("Now processing the access hander")
   end
@@ -158,9 +156,10 @@ function JWTAuthHandler:access(conf)
 
   -- get the JWT from the Nginx context
   -- Commented out and replaced with updated version
-  -- local token = ngx.ctx.authenticated_jwt_token
-  local token = kong.ctx.shared.authenticated_jwt_token
 
+  --local token = ngx.ctx.authenticated_jwt_token
+  local token = kong.ctx.shared.authenticated_jwt_token
+  
   if not token then
     ngx_log(ngx_error, "[jwt-auth-rbac plugin] Cannot get JWT token, add the ",
                        "JWT plugin to be able to use the JWT-Auth-RBAC plugin")
@@ -181,8 +180,9 @@ function JWTAuthHandler:access(conf)
   local msg_error_all = conf.msg_error_all
   local msg_error_any = conf.msg_error_any
   local msg_error_not_roles_claimed = conf.msg_error_not_roles_claimed
-  local roles_cfg = conf.roles
---Commented out to replace with database call
+  
+  --Commented out to replace with database call
+  --local roles_cfg = conf.roles
   --local myco_id = conf.co_id
   --local myrootgroupid = conf.rootgroupid
 
@@ -195,7 +195,7 @@ function JWTAuthHandler:access(conf)
   --variables from the decoded JWT
   local claims = jwt.claims
   local roles = claims[conf.roles_claim_name]
-  local thisrootgroupud = claims['rootgroupid']
+  local thisrootgroupid = claims['rootgroupid']
   local thisco_id = claims['co_id']
   --empty table variable
   local roles_table = {}
@@ -204,26 +204,29 @@ if myvdebug then
   kong.log.notice("co_id: ", myco_id)    
   kong.log.notice("rootgroupid: ", myrootgroupid)
   kong.log.notice("thisco_id: ", thisco_id)
-  kong.log.notice("thisrootgroupud: ", thisrootgroupud)
+  kong.log.notice("thisrootgroupid: ", thisrootgroupid)
 end
 
 
 -- implement caching
 --hit_level 1 = hit, 2 = , 3 = miss, 4 = not in DB
-local customer_cache_key = kong.db.lytx_customers:cache_key(thisco_id)
 --local customer_cache_key = "29e4352d-345f-43bd-9e3a-a69d1376e629" --kong.db.lytx_customers:cache_key(thisco_id)
 --local customer_cache_key = thisco_id --kong.db.lytx_customers:cache_key('02595')
 --local customer_cache_key = '02595'
+
+local customer_cache_key = kong.db.lytx_customers:cache_key(thisco_id)
+
 local customer, err, hit_level = kong.cache:get(customer_cache_key, nil, load_customer, thisco_id)
-kong.log.notice("Cache Hit Level: ", hit_level)
+
 
 if myvdebug then
   kong.log.notice("Cache Hit Level: ", hit_level)
 end
 
+-- assign variables values from database / cache lookup
 local myco_id = customer.co_id
 local myrootgroupid = customer.rootgroupid
-
+local roles_cfg = customer.roles
 -- end implement caching
 
 
@@ -239,7 +242,7 @@ if myco_id ~= thisco_id then
 end
 
 -- Validate rootgroupID
-if myrootgroupid ~= thisrootgroupud then
+if myrootgroupid ~= thisrootgroupid then
   return kong.response.exit(403, { message = "Invalid Root Group ID"})
 end
 
@@ -255,7 +258,7 @@ end
     return kong.response.exit(403, {message = msg_error_not_roles_claimed})
   end
 
-
+  
   -- if the claim is a string (single role), make it a table
   if type(roles) == "string" then
     if string.find(roles, ",") then
