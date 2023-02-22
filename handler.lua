@@ -122,8 +122,8 @@ local function load_customer(thisco_id)
   kong.log.notice("Executing database function: " .. tostring(thisco_id))
 
   --local customer, err = kong.db.lytx_customers:select({co_id = inco_id})
-  --local customer, err = kong.db.lytx_customers:select_by_key(thisco_id)
-  local customer, err = kong.db.lytx_customers:select({co_id = thisco_id})
+  local customer, err = kong.db.lytx_customers:select_by_cache_key(thisco_id)
+  --local customer, err = kong.db.lytx_customers:select({co_id = thisco_id})
 
   if err then
     kong.log.err("Error when selecting co_id from the database: " .. err)
@@ -210,10 +210,12 @@ end
 
 -- implement caching
 --hit_level 1 = hit, 2 = , 3 = miss, 4 = not in DB
---local customer_cache_key = kong.db.lytx_customers:cache_key(thisco_id)
+local customer_cache_key = kong.db.lytx_customers:cache_key(thisco_id)
 --local customer_cache_key = "29e4352d-345f-43bd-9e3a-a69d1376e629" --kong.db.lytx_customers:cache_key(thisco_id)
-local customer_cache_key = thisco_id --kong.db.lytx_customers:cache_key('02595')
+--local customer_cache_key = thisco_id --kong.db.lytx_customers:cache_key('02595')
+--local customer_cache_key = '02595'
 local customer, err, hit_level = kong.cache:get(customer_cache_key, nil, load_customer, thisco_id)
+kong.log.notice("Cache Hit Level: ", hit_level)
 
 if myvdebug then
   kong.log.notice("Cache Hit Level: ", hit_level)
@@ -221,6 +223,7 @@ end
 
 local myco_id = customer.co_id
 local myrootgroupid = customer.rootgroupid
+
 -- end implement caching
 
 

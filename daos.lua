@@ -2,7 +2,7 @@ local typedefs = require "kong.db.schema.typedefs"
 
 return {
   {
-    primary_key = { "id" },
+    primary_key = { "co_id" },
     name = "lytx_customers",
     endpoint_key = "co_id",
     cache_key = { "co_id" },
