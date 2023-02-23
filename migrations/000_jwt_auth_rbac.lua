@@ -6,7 +6,8 @@ return {
           "co_id"        TEXT                         UNIQUE,
           "rootgroupid"  TEXT,
           "iss"          TEXT,
-          "created_at"   TIMESTAMP WITH TIME ZONE     DEFAULT (CURRENT_TIMESTAMP(0) AT TIME ZONE 'UTC')
+          "created_at"   TIMESTAMP WITH TIME ZONE     DEFAULT (CURRENT_TIMESTAMP(0) AT TIME ZONE 'UTC'),
+          "roles"        TEXT []
         );
   
         DO $$
